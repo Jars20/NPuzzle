@@ -6,9 +6,22 @@ import java.util.List;
 public class Result {
     private int countSuccess;
     private int countFailed;
+    private int countUnsolvable;
     private int steps;
     private List<Integer> stepsList;
     private double timeCost;
+
+    public int getCountUnsolvable() {
+        return countUnsolvable;
+    }
+
+    public void setCountUnsolvable(int countUnsolvable) {
+        this.countUnsolvable = countUnsolvable;
+    }
+
+    public void setStepsList(List<Integer> stepsList) {
+        this.stepsList = stepsList;
+    }
 
     public double getTimeCost() {
         return timeCost;
@@ -21,13 +34,15 @@ public class Result {
     public Result() {
         setCountFailed(0);
         setCountSuccess(0);
+        setCountUnsolvable(0);
         setSteps(0);
         setTimeCost(0.0);
         initStepsList();
     }
 
-    public Result(int countSuccess, int countFailed, int steps, double timeCost) {
+    public Result(int countSuccess, int countUnsolvable, int countFailed, int steps, double timeCost) {
         this.countSuccess = countSuccess;
+        this.countUnsolvable = countUnsolvable;
         this.countFailed = countFailed;
         this.steps = steps;
         initStepsList();
@@ -79,11 +94,11 @@ public class Result {
     }
 
     public int getCountAll() {
-        return countFailed + countSuccess;
+        return countFailed + countSuccess+ countUnsolvable;
     }
 
     @Override
     public String toString() {
-        return "The num of all nodes is: " + getCountAll() + "\n" + "The num of successful nodes is: " + getCountSuccess() + "\n" + "The num of fail nodes is: " + getCountFailed() + "\n";
+        return "The num of all nodes is: " + getCountAll() + "\n" + "The num of successful nodes is: " + getCountSuccess() + "\n" + "The num of fail nodes is: " + getCountFailed() + "\n" + "The num of unsolvable nodes is: " + getCountUnsolvable() + "\n";
     }
 }

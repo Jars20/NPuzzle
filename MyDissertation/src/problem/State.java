@@ -9,7 +9,7 @@ public class State {
     private int zeroY;
     private int ivs;
 
-    //入参为一个一唯数组
+    //input is an int[] array
     public State(int[] tiles) {
         this.tiles = tiles;
         this.size = (int) Math.sqrt(tiles.length);
@@ -114,7 +114,7 @@ public class State {
         return 0;
     }
 
-    //计算曼哈顿距离之和，用于计算heuristicCost
+    //To calculate heuristicCost
     public int calHeuristicCost() {
         int heuristic = 0;
         for (int i = 0; i < size * size; i++) {

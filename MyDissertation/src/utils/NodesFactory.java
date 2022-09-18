@@ -58,7 +58,7 @@ public class NodesFactory {
             inits[i] = Integer.parseInt(tiles[i].trim());
         }
         State initState = new State(inits);
-        Node initNode = new Node(initState, 0, null);
+        Node initNode = new Node(initState, 0, null,-1);
         return initNode;
     }
 
@@ -72,7 +72,12 @@ public class NodesFactory {
 
         //add shuffled tiles into list
         for (int i = 0; i < nums; i++) {
-            int[] shuffled = shuffleUtil.shuffle(tiles);
+            int[] shuffled;
+            State state;
+            do {
+                shuffled = shuffleUtil.shuffle(tiles);
+                state = new State(shuffled);
+            } while (!Verifier.solvable(state));
             rlt.add(shuffled);
         }
 
@@ -80,10 +85,10 @@ public class NodesFactory {
     }
 
     public void insertNode2File(int numsOf3, int numsOf4) {
-        List<int[]> Nodes = new ArrayList<>(numsOf3+numsOf4);
+        List<int[]> Nodes = new ArrayList<>(numsOf3 + numsOf4);
         List<int[]> tilesOfSize3, tilesOfSize4;
-        tilesOfSize3 = createTiles(numsOf3,3);
-        tilesOfSize4 = createTiles(numsOf4,4);
+        tilesOfSize3 = createTiles(numsOf3, 3);
+        tilesOfSize4 = createTiles(numsOf4, 4);
 
         tilesOfSize3.addAll(tilesOfSize4);
 
@@ -93,7 +98,7 @@ public class NodesFactory {
             bufferedWriter = new BufferedWriter(fw);
 
             for (int[] tiles : tilesOfSize3) {
-                String nodeTemp = Arrays.toString(tiles).replace("[","").replace("]","");
+                String nodeTemp = Arrays.toString(tiles).replace("[", "").replace("]", "");
 
                 bufferedWriter.write(nodeTemp);
                 bufferedWriter.newLine();
@@ -103,8 +108,8 @@ public class NodesFactory {
             bufferedWriter.flush();
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-            if (bufferedWriter!=null){
+        } finally {
+            if (bufferedWriter != null) {
                 try {
                     bufferedWriter.close();
                 } catch (IOException e) {

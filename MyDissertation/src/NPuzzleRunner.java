@@ -1,10 +1,9 @@
 import utils.NodesFactory;
 import problem.Node;
 import problem.Result;
-import problem.State;
 import solution.*;
+import utils.Verifier;
 
-import java.util.Collections;
 import java.util.List;
 
 public class NPuzzleRunner {
@@ -30,10 +29,11 @@ public class NPuzzleRunner {
                 System.out.println();
                 System.out.println("++++++++++++++++++++++++++++++++++++++++++++");
                 System.out.println("The No." + count + " Nodes");
-                if (!solvable(nStart.getState())) {
+
+                if (!Verifier.solvable(nStart.getState())) {
                     System.out.println("This node are not solvable!");
 
-                    result.setCountFailed(result.getCountFailed() + 1);
+                    result.setCountUnsolvable(result.getCountUnsolvable() + 1);
                     continue;
                 }
                 algorithm.search(nStart, result);
@@ -43,148 +43,61 @@ public class NPuzzleRunner {
             result.setTimeCost(endTime - startTime);
             System.out.println(result.toString());
             System.out.println("Total time cost = " + (result.getTimeCost() / 1000.0));
-        }
 
-    }
-
-    /**
-     * Judge the state whether solvable or not
-     *
-     * @param state
-     * @return
-     */
-    static boolean solvable(State state) {
-        int size = state.getSize();
-        if (size % 2 == 1) {
-            return state.getIvs() % 2 == 0;
-        } else {
-            int[] tiles = state.getTiles();
-            int height = 0;
-            for (int i = 0; i < tiles.length; i++) {
-                if (tiles[i] == 0) {
-                    height = i / size;
-                }
+            List<Integer> stepsList = result.getStepsList();
+            int i = 0;
+            for (Integer integer : stepsList) {
+                System.out.println("The step cost of No. " + (++i) + " is :" + integer);
             }
-            return (state.getIvs() + Math.abs(height - size + 1)) % 2 == 0;
         }
+
     }
-
-
-
 
     public static void main(String[] args) {
 
         //Create random inits to start
-        //NodesFactory nf = new NodesFactory("create_nodes.txt");
-        //nf.insertNode2File(50,50);
+        NodesFactory nf = new NodesFactory("create_nodes.txt");
+        //nf.insertNode2File(10,0);
 
 
-        List<Node> initNodes = NodesFactory.InputNodeFromFile("init_nodes.txt");
+        List<Node> initNodes = NodesFactory.InputNodeFromFile("create_nodes.txt");
 
 
-        HillClimbing hc = new HillClimbing();
-        Algorithm ga = new Genetic(20, 50, 2000, 0.3, 0.3, 0.3);
+        DepthFirstSearch dfs = new DepthFirstSearch();
+        //ok
+        Algorithm ga = new Genetic(30, 200, 100, 0.3, 0.3, 0.03);
+        //成功率2/100
         SimulatedAnnealing sa = new SimulatedAnnealing(5, 0.001, 0.8, 150);
+        //死循环(次数太多。一次8puzzle 64272步，时间410秒)
         BreadthFirstSearch bfs = new BreadthFirstSearch();
+        //成功率100，但是只能解决8puzzle问题。当处理15puzzle问题时候效率很低
         IterativeDeepeningAStar ida = new IterativeDeepeningAStar();
 
         NPuzzleRunner nr = new NPuzzleRunner();
-        NPuzzleRunner.Runner runner = nr.new Runner(hc, initNodes);
+        NPuzzleRunner.Runner runner = nr.new Runner(dfs, initNodes);
         runner.run();
-
-
-        ////GA
-        //Result resultOfGA = new Result();
-        //long startOfGA = System.currentTimeMillis();
-        //for (int count = 0; count < initNodes.size(); count++) {
-        //    Node nStart = initNodes.get(count);
-        //    System.out.println("The No." + count + " Nodes");
-        //    if (!solvable(nStart.getState())) {
-        //        System.out.println("The No." + count + " Nodes");
-        //        countFail++;
-        //        resultOfGA.setCountFailed(resultOfGA.getCountFailed());
-        //        continue;
-        //    }
-        //    Algorithm ga = new Genetic(20, 50, 2000, 0.3, 0.3, 0.3);
-        //    ga.search(nStart, resultOfGA);
-        //}
-        //long endOfGA = System.currentTimeMillis();
-        //resultOfGA.setTimeCost(endOfGA - startOfGA);
-        //System.out.println("Total time cost = " + (resultOfGA.getTimeCost() / 1000.0));
-        //
-        //
-        ////SA
-        //Result resultOfSA = new Result();
-        //long startOfSA = System.currentTimeMillis();
-        //for (int count = 0; count < initNodes.size(); count++) {
-        //    Node nStart = initNodes.get(count);
-        //    System.out.println("The No." + count + " Nodes");
-        //    if (!solvable(nStart.getState())) {
-        //        System.out.println("This node are not solvable!");
-        //        countFail++;
-        //
-        //        continue;
-        //    }
-        //    SimulatedAnnealing sa = new SimulatedAnnealing(5, 0.001, 0.8, 150);
-        //    sa.search(nStart, resultOfSA);
-        //}
-        //long endOfSA = System.currentTimeMillis();
-        //resultOfSA.setTimeCost(endOfSA - startOfSA);
-        //System.out.println("Total time cost = " + (resultOfSA.getTimeCost() / 1000.0));
-        //
-        //
-        ////BFS
-        //Result resultOfBFS = new Result();
-        //long startOfBFS = System.currentTimeMillis();
-        //for (int count = 0; count < initNodes.size(); count++) {
-        //    Node nStart = initNodes.get(count);
-        //    System.out.println("The No." + count + " Nodes");
-        //    if (!solvable(nStart.getState())) {
-        //        System.out.println("This node are not solvable!");
-        //
-        //        countFail++;
-        //        continue;
-        //    }
-        //    BreadthFirstSearch bfs = new BreadthFirstSearch();
-        //    bfs.search(nStart, resultOfBFS);
-        //}
-        //long endOfBFS = System.currentTimeMillis();
-        //resultOfSA.setTimeCost(endOfBFS - startOfBFS);
-        //System.out.println("Total time cost = " + (resultOfBFS.getTimeCost() / 1000.0));
-        //
-        ////IDA
-        //Result resultOfIDA = new Result();
-        //long startOfIDA = System.currentTimeMillis();
-        //for (int count = 0; count < initNodes.size(); count++) {
-        //    Node nStart = initNodes.get(count);
-        //    System.out.println("The No." + count + " Nodes");
-        //    if (!solvable(nStart.getState())) {
-        //        System.out.println("This node are not solvable!");
-        //
-        //        countFail++;
-        //        continue;
-        //    }
-        //    IterativeDeepeningAStar ida = new IterativeDeepeningAStar();
-        //    ida.search(nStart, resultOfBFS);
-        //}
-        //long endOfIDA = System.currentTimeMillis();
-        //resultOfIDA.setTimeCost(endOfIDA - startOfIDA);
-        //System.out.println("Total time cost = " + (resultOfIDA.getTimeCost() / 1000.0));
-
-
-        //Genetic g = new Genetic(20,50,2000,0.3,0.3,0.3);
-        //g.search(nStart);
-
-        //SimulatedAnnealing sa = new SimulatedAnnealing(5,0.001,0.8,150);
-        //sa.search(nStart);
-
-        //BreadthFirstSearch bfs = new BreadthFirstSearch();
-        //bfs.search(nStart);
-
-        //IterativeDeepeningAStar ida = new IterativeDeepeningAStar();
-        //ida.search(nStart);
     }
 
-
+///**
+    // * Judge the state whether solvable or not
+    // *
+    // * @param state
+    // * @return
+    // */
+    //static boolean solvable(State state) {
+    //    int size = state.getSize();
+    //    if (size % 2 == 1) {
+    //        return state.getIvs() % 2 == 0;
+    //    } else {
+    //        int[] tiles = state.getTiles();
+    //        int height = 0;
+    //        for (int i = 0; i < tiles.length; i++) {
+    //            if (tiles[i] == 0) {
+    //                height = i / size;
+    //            }
+    //        }
+    //        return (state.getIvs() + Math.abs(height - size + 1)) % 2 == 0;
+    //    }
+    //}
 }
 

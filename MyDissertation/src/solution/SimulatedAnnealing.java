@@ -3,6 +3,7 @@ package solution;
 import problem.Node;
 import problem.Result;
 import problem.State;
+import utils.Verifier;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -93,6 +94,7 @@ public class SimulatedAnnealing implements Algorithm {
 
                 } else if (Math.exp(-dTotalCost / TEMPERATURE) > r) {
                     System.out.println("Accepted, although the node isn't better.");
+
                     cur.getState().display();
                     cur = childNode;
                 } else {
@@ -109,7 +111,7 @@ public class SimulatedAnnealing implements Algorithm {
     }
 
     /**
-     * Move the blank in random.
+     * Move the blank one step in random.
      *
      * @param node the input node
      * @return Moved blank
@@ -125,13 +127,14 @@ public class SimulatedAnnealing implements Algorithm {
 
         int dx, dy;
 
+        int randomI;
         do {
             //random a direction
-            int randomI = random.nextInt(4);
+            randomI = random.nextInt(4);
 
             dx = zx + X_MOVE[randomI];
             dy = zy + Y_MOVE[randomI];
-        } while (dx < 0 || dx >= size || dy < 0 || dy >= size);
+        } while (dx < 0 || dx >= size || dy < 0 || dy >= size|| !Verifier.isLegalMove(randomI,node.getPreMove()));
 
         int newI = dx * size + dy;
         //make a new array as new state to swap
@@ -143,6 +146,6 @@ public class SimulatedAnnealing implements Algorithm {
 
         State childState = new State(newTile);
         //make a new node
-        return new Node(childState, pathCost + 1, node);
+        return new Node(childState, pathCost + 1, node, randomI);
     }
 }

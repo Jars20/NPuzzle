@@ -70,7 +70,6 @@ public class Genetic implements Algorithm {
         population = initPopulation(NUMS, LENGTH);
         //get the init state
         State state = node.getState();
-        int[] initTiles = state.getTiles();
         int countStep = 0;
 
         for (int i = 0; i < GENERATION; i++) {

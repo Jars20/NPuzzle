@@ -8,16 +8,27 @@ public class Node {
     private int heuristicCost;
     private int pathCost;
     private Node parent;
+    //preMove: 0:DOWN  1:UP  2:LEFT  3:RIGHT
+    private int preMove;
+
+    public int getPreMove() {
+        return preMove;
+    }
+
+    public void setPreMove(int preMove) {
+        this.preMove = preMove;
+    }
 
     //to cal the 曼哈顿距离
     private int[] x;
     private int[] y;
 
-    public Node(State state, int pathCost, Node parent) {
+    public Node(State state, int pathCost, Node parent,int direction) {
         this.state = state;
         this.heuristicCost = state.calHeuristicCost();
         this.pathCost = pathCost;
         this.parent = parent;
+        this.preMove = direction;
     }
 
     //constructor

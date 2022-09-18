@@ -5,59 +5,62 @@ import problem.Result;
 import problem.State;
 import utils.Verifier;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
-public class BreadthFirstSearch implements Algorithm {
-    private Queue<Node> open;
-    private List<Node> closed;
-    int stepCount;
+public class DepthFirstSearch implements Algorithm {
+    // Whether findTarget or not
+    boolean findTarget;
+    //the depth of the dfs
+    int depth = 0;
+    int countStep = 0;
 
     //directions:down,up,left,right
     final static int[] X_MOVE = new int[]{1, -1, 0, 0};
     final static int[] Y_MOVE = new int[]{0, 0, -1, 1};
 
-    boolean findTarget;
+    private Stack<Node> open;
+    private List<Node> closed;
+
 
     /**
-     * Breadth First Search
+     * Depth-first-search(DFS) algorithm.
      *
      * @param node
      * @param result
      */
     @Override
     public void search(Node node, Result result) {
-        open = new LinkedList<>();
+        open = new Stack<>();
         closed = new LinkedList<>();
-        findTarget = false;
-        stepCount = 0;
-
-        open.add(node);
+        countStep = 0;
+        open.push(node);
         System.out.println();
         node.getState().display();
 
         while (!open.isEmpty() && !findTarget) {
-            Node parent = open.poll();
-            assert parent != null;
+            Node parent = open.pop();
+
+
+            //System.out.println("The no." + countStep + " step, the cost =" + parent.getPathCost());
+
 
             closed.add(parent);
             moveBlank(parent);
         }
         if (findTarget) {
             System.out.println("Find the target path!");
-
             System.out.println();
             //record the success result
             result.setCountSuccess(result.getCountSuccess() + 1);
             //record the steps cost
-            result.addStepInList(stepCount);
-            return;
+            System.out.println("The countStep = " + countStep );
+            result.addStepInList(countStep);
+        } else {
+            System.out.println("Failed, cannot find the target path.");
+            //record the failed result
+            result.setCountFailed(result.getCountFailed() + 1);
         }
-        System.out.println("Failed, did not find the target path.");
-        //record the failed result
-        result.setCountFailed(result.getCountFailed() + 1);
+
     }
 
     /**
@@ -76,10 +79,11 @@ public class BreadthFirstSearch implements Algorithm {
 
         int dx, dy;
 
+
         for (int i = 0; i < 4; i++) {
             dx = zx + X_MOVE[i];
             dy = zy + Y_MOVE[i];
-            if (dx < 0 || dx >= size || dy < 0 || dy >= size || !Verifier.isLegalMove(node.getPreMove(), i)) {
+            if (dx < 0 || dx >= size || dy < 0 || dy >= size|| !Verifier.isLegalMove(node.getPreMove(),i)) {
                 continue;
             }
 
@@ -93,16 +97,18 @@ public class BreadthFirstSearch implements Algorithm {
             newTile[zi] = temp;
             State childState = new State(newTile);
 
+
             if (childState.isGoal()) {
                 findTarget = true;
-                System.out.println("Find the target path, stepCost = " + (node.getPathCost() + 1));
+                System.out.println("Find the target path, depth = " + (node.getPathCost() + 1));
                 return;
             }
-            //make a new node which shouldn't be in open or closed list, add it to open list
-            Node childNode = new Node(childState, pathCost + 1, node, i);
+            //make a new node
+            Node childNode = new Node(childState, pathCost + 1, node,i);
             if (!open.contains(childNode) && !closed.contains(childNode)) {
-                open.add(childNode);
-                stepCount++;
+                countStep++;
+                System.out.println("Create the No."+ countStep+" Node!");
+                open.push(childNode);
             }
         }
     }

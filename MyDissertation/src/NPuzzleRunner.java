@@ -41,6 +41,7 @@ public class NPuzzleRunner {
 
             long endTime = System.currentTimeMillis();
             result.setTimeCost(endTime - startTime);
+            System.out.println("++++++++++++++++++++++++++++++++++");
             System.out.println(result.toString());
             System.out.println("Total time cost = " + (result.getTimeCost() / 1000.0));
 
@@ -49,6 +50,8 @@ public class NPuzzleRunner {
             for (Integer integer : stepsList) {
                 System.out.println("The step cost of No. " + (++i) + " is :" + integer);
             }
+            System.out.println();
+            System.out.println("The average step is: "+ result.getAvgStep());
         }
 
     }
@@ -56,25 +59,24 @@ public class NPuzzleRunner {
     public static void main(String[] args) {
 
         //Create random inits to start
-        NodesFactory nf = new NodesFactory("create_nodes.txt");
-        //nf.insertNode2File(10,0);
+        NodesFactory nf = new NodesFactory("init_nodes.txt");
+        //nf.insertNode2File(0,100);
+        List<Node> initNodes = NodesFactory.InputNodeFromFile("init_nodes.txt");
 
 
-        List<Node> initNodes = NodesFactory.InputNodeFromFile("create_nodes.txt");
-
-
-        DepthFirstSearch dfs = new DepthFirstSearch();
+        Algorithm dfs = new DepthFirstSearch();
         //ok
-        Algorithm ga = new Genetic(30, 200, 100, 0.3, 0.3, 0.03);
+        //30 200 100 0.3 0.3 0.03 03
+        Algorithm ga = new Genetic(150, 300, 2000, 0.02, 0.3, 0.01);
         //成功率2/100
-        SimulatedAnnealing sa = new SimulatedAnnealing(5, 0.001, 0.8, 150);
+        Algorithm sa = new SimulatedAnnealing(5, 0.01, 0.999, 150);
         //死循环(次数太多。一次8puzzle 64272步，时间410秒)
-        BreadthFirstSearch bfs = new BreadthFirstSearch();
+        Algorithm bfs = new BreadthFirstSearch();
         //成功率100，但是只能解决8puzzle问题。当处理15puzzle问题时候效率很低
-        IterativeDeepeningAStar ida = new IterativeDeepeningAStar();
+        Algorithm ida = new IterativeDeepeningAStar();
 
         NPuzzleRunner nr = new NPuzzleRunner();
-        NPuzzleRunner.Runner runner = nr.new Runner(dfs, initNodes);
+        NPuzzleRunner.Runner runner = nr.new Runner(ga, initNodes);
         runner.run();
     }
 

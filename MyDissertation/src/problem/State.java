@@ -130,6 +130,38 @@ public class State {
         return heuristic;
     }
 
+    //for genetic algorithm
+    public int calSurroundIvs() {
+        int hSum = 0;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                int mid;
+                if (tiles[i * size + j] == 0) {
+                    mid = 16;
+                } else {
+                    mid = tiles[i * size + j];
+                }
+                int h = 0;
+
+                if (i > 0 && tiles[(i - 1) * size + j] > mid) {
+                    h += 1;
+                }
+                if (i < size - 1 && tiles[(i + 1) * size + j] < mid) {
+                    h += 1;
+                }
+                if (j > 0 && tiles[i * size + (j - 1)] > mid) {
+                    h += 1;
+                }
+                if (j < size - 1 && tiles[i * size + (j + 1)] < mid) {
+                    h += 1;
+                }
+                hSum += h / 2;
+            }
+        }
+        return hSum;
+    }
+
+
     public boolean isGoal() {
         return calHeuristicCost() == 0;
     }
@@ -204,6 +236,8 @@ public class State {
                 return false;
             }
         }
+        //String s1 = Arrays.toString(tiles1);
+        //String s2 = Arrays.toString(tiles2);
         return true;
     }
 }

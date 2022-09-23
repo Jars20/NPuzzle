@@ -68,12 +68,15 @@ public class SimulatedAnnealing implements Algorithm {
         int countStep = 0;
         Node cur = node;
         cur.getState().display();
+        double temperature = TEMPERATURE;
+        double temperature_min = TEMPERATURE_MIN;
 
-        while (TEMPERATURE > TEMPERATURE_MIN) {
-            System.out.println("The current temperature is " + TEMPERATURE);
+        while (temperature > temperature_min) {
+            //System.out.println("The current temperature is " + temperature);
             for (int i = 0; i < LOOP_COUNT; i++) {
-                System.out.println("------------------------------");
+                //System.out.println("------------------------------");
                 int heuristicCost = cur.getHeuristicCost();
+
                 if (cur.getState().isGoal()) {
                     System.out.println("Find the path, total steps = " + countStep);
 
@@ -82,26 +85,28 @@ public class SimulatedAnnealing implements Algorithm {
                     result.addStepInList(countStep);
                     return;
                 }
-                //move
+                //move, get random neighbour
                 Node childNode = randomMove(cur);
                 countStep++;
-                int dTotalCost = childNode.getHeuristicCost() - heuristicCost;
+                double dTotalCost = childNode.getHeuristicCost() - heuristicCost;
                 double r = random.nextDouble();
                 if (dTotalCost < 0) {
-                    System.out.println("Accept the better one");
-                    cur.getState().display();
+                    //System.out.println("Accept the better one");
+                    //cur.getState().display();
+
                     cur = childNode;
 
-                } else if (Math.exp(-dTotalCost / TEMPERATURE) > r) {
-                    System.out.println("Accepted, although the node isn't better.");
+                } else if (Math.exp(-dTotalCost / temperature) > r) {
+                    //System.out.println("Accepted, although the node isn't better.");
+                    //cur.getState().display();
 
-                    cur.getState().display();
                     cur = childNode;
                 } else {
-                    System.out.println("Did not accept!");
+                    //System.out.println("Did not accept!");
+                    continue;
                 }
             }
-            TEMPERATURE *= ATTENUATION;
+            temperature *= ATTENUATION;
         }
         //search failed
         System.out.println();

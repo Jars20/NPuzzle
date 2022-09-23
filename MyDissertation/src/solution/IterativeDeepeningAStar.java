@@ -23,6 +23,8 @@ public class IterativeDeepeningAStar implements Algorithm {
     //the index of zero
     private int posOfZero;
 
+    private int maxDepth;
+
     //directions:down,up,left,right
     final static int[] X_MOVE = new int[]{0, 0, 1, -1};
     final static int[] Y_MOVE = new int[]{1, -1, 0, 0};
@@ -35,9 +37,6 @@ public class IterativeDeepeningAStar implements Algorithm {
         this.bound = bound;
     }
 
-    //TODO
-    public static int[] xx;
-    public static int[] yy;
 
     /**
      * IDA* search
@@ -50,13 +49,13 @@ public class IterativeDeepeningAStar implements Algorithm {
         stepCount = 0;
         //get the tiles and run IDA* base on it
         tiles2Sort = node.getState().getTiles();
+        maxDepth = Integer.MIN_VALUE;
         size = node.getState().getSize();
         pathGot = false;
 
         posOfZero = node.getState().getZeroX()*size+node.getState().getZeroY();
 
 
-        System.out.println("++++++++++++++++++++++++++++++");
         System.out.println();
         node.getState().display();
         int heuristicCost = calHeuristicCost(tiles2Sort, size);
@@ -70,36 +69,17 @@ public class IterativeDeepeningAStar implements Algorithm {
 
 
         for (bound = heuristicCost; bound <= 100; bound = dfs(0, heuristicCost, -1)) {
-            System.out.println("bound expanded! bound = "+ bound);
 
             if (pathGot) {
                 //find the final target
                 result.setCountSuccess(result.getCountSuccess() + 1);
                 //record the steps cost
                 result.addStepInList(stepCount);
-                System.out.println("Has cost steps = " + stepCount);
+                System.out.println("The depth of the tree = " + (maxDepth+1));
                 return;
             }
         }
 
-        //while (!pathGot) {
-        //    //dfs with created stack
-        //    //dfs(node);
-        //    dfs(zeroX,zeroY, heuristicCost, -1);
-        //
-        //    //get target successful
-        //    if (pathGot) {
-        //        result.setCountSuccess(result.getCountSuccess() + 1);
-        //        //record the steps cost
-        //        result.addStepInList(stepCount);
-        //
-        //        return;
-        //    } else {
-        //        bound = minTotalCostRec;
-        //    }
-        //    //totalCosts.clear();
-        //    minTotalCostRec = Integer.MAX_VALUE;
-        //}
     }
 
     public int dfs(int step, int heuristicCost, int preMove) {
@@ -114,7 +94,10 @@ public class IterativeDeepeningAStar implements Algorithm {
             return step;
         }
 
-
+        //record the deepest depth
+        if (step>maxDepth){
+            maxDepth = step;
+        }
         //before start, count the step cost
         stepCount++;
         int indexOfZero = posOfZero;
@@ -190,154 +173,4 @@ public class IterativeDeepeningAStar implements Algorithm {
         return heuristic;
     }
 
-    //private void dfs(int zx, int zy, int len, int preDis) {
-    //    if (pathGot) {
-    //        return;
-    //    }
-    //    //int heuristicTemp;
-    //    int heuristicCost = calHeuristicCost(tiles2Sort, size);
-    //    //f(n) = g(n) +h(n)
-    //    int totalCost = heuristicCost + len;
-    //    //System.out.println("heuristicCost"+ heuristicCost+", totalcost = "+ totalCost);
-    //
-    //    stepCount++;
-    //    //System.out.println("+++++++++++++++++++++++++++++++++");
-    //    //System.out.println("The step count = " + stepCount);
-    //    //System.out.println("The move count = " + len);
-    //    //System.out.println(Arrays.toString(tiles2Sort));
-    //    //System.out.println();
-    //
-    //    //update record minTotalCost
-    //    if (minTotalCostRec > totalCost && totalCost > bound) {
-    //        minTotalCostRec = totalCost;
-    //    }
-    //    if (len <= bound) {
-    //        //meet the target
-    //        if (heuristicCost == 0) {
-    //            System.out.println("Find the target path, stepCost = " + len + 1);
-    //            pathGot = true;
-    //            return;
-    //        }
-    //        //abandon this path
-    //        if (len == bound) {
-    //            //System.out.println("len == bound!, backtracking!");
-    //            return;
-    //        }
-    //    }
-    //
-    //
-    //    for (int i = 0; i < 4; i++) {
-    //        int dx = zx + X_MOVE[i];
-    //        int dy = zy + Y_MOVE[i];
-    //        if (dx < 0 || dy < 0 || dy >= size || dx >= size || !Verifier.isLegalMove(preDis, i)) {
-    //            continue;
-    //        }
-    //        int zeroI = zx * size + zy;
-    //        int newI = dx * size + dy;
-    //
-    //        //swap the tiles
-    //        swap(tiles2Sort, zeroI, newI);
-    //
-    //        //get the moved tile's target
-    //        //int num = tiles2Sort[dx * size + dy];
-    //        //int tarX = (num - 1) / size;
-    //        //int tarY = (num - 1) % size;
-    //        //heuristicTemp = heuristicCost -(Math.abs(tarX-dx)+Math.abs(tarY-dy))+(Math.abs(tarX-zx)+Math.abs(tarY-zy));
-    //
-    //        //recursion
-    //        if (totalCost <= bound) {
-    //            System.out.println("totalCost <= bound :" + bound);
-    //            dfs(dx, dy, len + 1, i);
-    //            if (pathGot) {
-    //                return;
-    //            }
-    //        }
-    //        //backtracking
-    //        swap(tiles2Sort, zeroI, newI);
-    //
-    //    }
-    //
-    //}
-    //
-    //void swap(int[] tiles, int zeroI, int newI) {
-    //
-    //    int temp = tiles[zeroI];
-    //    tiles[zeroI] = tiles[newI];
-    //    tiles[newI] = temp;
-    //}
-
-    ///**
-    // * Move the blank and add the moved fragment to the list open.
-    // *
-    // * @param node
-    // */
-    //private void moveBlank(Node node) {
-    //    State state = node.getState();
-    //    int zx = state.getZeroX();
-    //    int zy = state.getZeroY();
-    //    int size = state.getSize();
-    //    int zi = zx * size + zy;
-    //    int[] tiles = state.getTiles();
-    //    int pathCost = node.getPathCost();
-    //
-    //    int dx, dy;
-    //
-    //    for (int i = 0; i < 4; i++) {
-    //        dx = zx + X_MOVE[i];
-    //        dy = zy + Y_MOVE[i];
-    //        if (dx < 0 || dx >= size || dy < 0 || dy >= size || !Verifier.isLegalMove(node.getPreMove(), i)) {
-    //            continue;
-    //        }
-    //
-    //        //make a new array as new state to swap
-    //        int newI = dx * size + dy;
-    //        int[] newTile = Arrays.copyOf(tiles, tiles.length);
-    //
-    //        //swap
-    //        int temp = newTile[newI];
-    //        newTile[newI] = newTile[zi];
-    //        newTile[zi] = temp;
-    //        State childState = new State(newTile);
-    //
-    //        if (childState.isGoal()) {
-    //            System.out.println("Find the target path, stepCost = " + node.getPathCost() + 1);
-    //            pathGot = true;
-    //            return;
-    //        }
-    //
-    //        //make a new node, add it to open list
-    //        Node childNode = new Node(childState, pathCost + 1, node, i);
-    //        if (!open.contains(childNode) && !closed.contains(childNode)) {
-    //            open.add(childNode);
-    //        }
-    //    }
-    //}
-
-    //dfs use the created stack
-    //private void dfs(Node node) {
-    //    open = new Stack<>();
-    //    closed = new LinkedList<>();
-    //    open.add(node);
-    //
-    //    while (!open.isEmpty()) {
-    //        System.out.println("--------------------------------------------");
-    //        Node parent = open.pop();
-    //
-    //        stepCount++;
-    //        assert parent != null;
-    //        System.out.println("The no." + stepCount + " step:");
-    //        System.out.println("The path cost = " + parent.getPathCost());
-    //        parent.getState().display();
-    //
-    //        closed.add(parent);
-    //
-    //        if (parent.getTotalCost() > bound) {
-    //            if (minTotalCostRec > parent.getTotalCost()) {
-    //                minTotalCostRec = parent.getTotalCost();
-    //            }
-    //        } else {
-    //            moveBlank(parent);
-    //        }
-    //    }
-    //}
 }

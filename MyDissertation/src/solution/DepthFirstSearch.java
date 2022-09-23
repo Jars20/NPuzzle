@@ -32,9 +32,9 @@ public class DepthFirstSearch implements Algorithm {
     public void search(Node node, Result result) {
         open = new Stack<>();
         closed = new LinkedList<>();
+        findTarget = false;
         countStep = 0;
         open.push(node);
-        System.out.println();
         node.getState().display();
 
         while (!open.isEmpty() && !findTarget) {
@@ -107,7 +107,6 @@ public class DepthFirstSearch implements Algorithm {
             Node childNode = new Node(childState, pathCost + 1, node,i);
             if (!open.contains(childNode) && !closed.contains(childNode)) {
                 countStep++;
-                System.out.println("Create the No."+ countStep+" Node!");
                 open.push(childNode);
             }
         }

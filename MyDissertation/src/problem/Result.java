@@ -49,7 +49,7 @@ public class Result {
         this.timeCost = timeCost;
     }
 
-    double getAvgStep() {
+    public double getAvgStep() {
         double sum = 0.0;
         for (Integer integer : stepsList) {
             sum += (double) integer;

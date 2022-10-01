@@ -11,17 +11,6 @@ public class Node {
     //preMove: 0:DOWN  1:UP  2:LEFT  3:RIGHT
     private int preMove;
 
-    public int getPreMove() {
-        return preMove;
-    }
-
-    public void setPreMove(int preMove) {
-        this.preMove = preMove;
-    }
-
-    //to cal the 曼哈顿距离
-    private int[] x;
-    private int[] y;
 
     public Node(State state, int pathCost, Node parent,int direction) {
         this.state = state;
@@ -91,5 +80,14 @@ public class Node {
     public void setHeuristicCost(int heuristicCost) {
         this.heuristicCost = heuristicCost;
     }
+
+    public int getPreMove() {
+        return preMove;
+    }
+
+    public void setPreMove(int preMove) {
+        this.preMove = preMove;
+    }
+
 
 }

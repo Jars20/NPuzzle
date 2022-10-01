@@ -84,13 +84,15 @@ public class NodesFactory {
         return rlt;
     }
 
-    public void insertNode2File(int numsOf3, int numsOf4) {
+    public void insertNode2File(int numsOf3, int numsOf4,int numsOf5) {
         List<int[]> Nodes = new ArrayList<>(numsOf3 + numsOf4);
-        List<int[]> tilesOfSize3, tilesOfSize4;
+        List<int[]> tilesOfSize3, tilesOfSize4,tilesOfSize5;
         tilesOfSize3 = createTiles(numsOf3, 3);
         tilesOfSize4 = createTiles(numsOf4, 4);
+        tilesOfSize5 = createTiles(numsOf5,5);
 
         tilesOfSize3.addAll(tilesOfSize4);
+        tilesOfSize3.addAll(tilesOfSize5);
 
         BufferedWriter bufferedWriter = null;
         try {

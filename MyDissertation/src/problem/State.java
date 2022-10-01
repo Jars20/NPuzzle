@@ -91,7 +91,6 @@ public class State {
     }
 
     //cal the x of blank
-    //求0的坐标,纵坐标X,表示行数
     public int calZeroX() {
         for (int i = 0; i < size * size; i++) {
             if (tiles[i] == 0) {
@@ -103,7 +102,6 @@ public class State {
     }
 
     //cal the y of blank
-    //求0的坐标,纵坐标Y,表示列数
     public int calZeroY() {
         for (int i = 0; i < size * size; i++) {
             if (tiles[i] == 0) {
@@ -160,6 +158,8 @@ public class State {
         }
         return hSum;
     }
+
+
 
 
     public boolean isGoal() {

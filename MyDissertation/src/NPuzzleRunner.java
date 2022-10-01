@@ -4,6 +4,7 @@ import problem.Result;
 import solution.*;
 import utils.Verifier;
 
+import java.util.Collections;
 import java.util.List;
 
 public class NPuzzleRunner {
@@ -18,6 +19,7 @@ public class NPuzzleRunner {
             this.algorithm = algorithm;
             this.initNodes = initNodes;
         }
+        
 
         public void run() {
 
@@ -45,13 +47,26 @@ public class NPuzzleRunner {
             System.out.println(result.toString());
             System.out.println("Total time cost = " + (result.getTimeCost() / 1000.0));
 
+            //for genetic to show the time consumption
+            if (!result.getTimeList().isEmpty()) {
+                System.out.println();
+                System.out.println("+++++++++++++time consumption++++++++++++");
+                List<Double> times = result.getTimeList();
+                for (int i = 0; i < times.size(); i++) {
+                    System.out.println("The No. " + i + " Node Time cost = " + (times.get(i)/1000)+" s.");
+                }
+                System.out.println();
+                System.out.println("The average time consumption = "+ (result.getAvgTime()/1000) +" s.");
+            }
+
+            System.out.println("+++++++++++++step consumption++++++++++++");
             List<Integer> stepsList = result.getStepsList();
             int i = 0;
             for (Integer integer : stepsList) {
                 System.out.println("The step cost of No. " + (++i) + " is :" + integer);
             }
             System.out.println();
-            System.out.println("The average step is: "+ result.getAvgStep());
+            System.out.println("The average step is: " + result.getAvgStep());
         }
 
     }
@@ -59,20 +74,17 @@ public class NPuzzleRunner {
     public static void main(String[] args) {
 
         //Create random inits to start
-        NodesFactory nf = new NodesFactory("init_nodes.txt");
-        //nf.insertNode2File(0,100);
-        List<Node> initNodes = NodesFactory.InputNodeFromFile("init_nodes.txt");
+        NodesFactory nf = new NodesFactory("24_init_nodes.txt");
+        //TODO: modify to adapt to 24-puzzle
+        //nf.insertNode2File(0,0,0);
+        List<Node> initNodes = NodesFactory.InputNodeFromFile("24_init_nodes.txt");
 
 
         Algorithm dfs = new DepthFirstSearch();
-        //ok
-        //30 200 100 0.3 0.3 0.03 03
-        Algorithm ga = new Genetic(150, 300, 2000, 0.02, 0.3, 0.01);
-        //成功率2/100
-        Algorithm sa = new SimulatedAnnealing(5, 0.01, 0.999, 150);
-        //死循环(次数太多。一次8puzzle 64272步，时间410秒)
+        //30 200 100 0.03 03
+        Algorithm ga = new Genetic(100, 500, 30,10,0.9, 0.01);
+        Algorithm sa = new SimulatedAnnealing(5, 0.01, 0.9999, 150);
         Algorithm bfs = new BreadthFirstSearch();
-        //成功率100，但是只能解决8puzzle问题。当处理15puzzle问题时候效率很低
         Algorithm ida = new IterativeDeepeningAStar();
 
         NPuzzleRunner nr = new NPuzzleRunner();
@@ -80,26 +92,5 @@ public class NPuzzleRunner {
         runner.run();
     }
 
-///**
-    // * Judge the state whether solvable or not
-    // *
-    // * @param state
-    // * @return
-    // */
-    //static boolean solvable(State state) {
-    //    int size = state.getSize();
-    //    if (size % 2 == 1) {
-    //        return state.getIvs() % 2 == 0;
-    //    } else {
-    //        int[] tiles = state.getTiles();
-    //        int height = 0;
-    //        for (int i = 0; i < tiles.length; i++) {
-    //            if (tiles[i] == 0) {
-    //                height = i / size;
-    //            }
-    //        }
-    //        return (state.getIvs() + Math.abs(height - size + 1)) % 2 == 0;
-    //    }
-    //}
 }
 

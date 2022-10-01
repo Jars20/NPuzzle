@@ -10,6 +10,7 @@ public class Result {
     private int steps;
     private List<Integer> stepsList;
     private double timeCost;
+    private List<Double> timeList;
 
     public int getCountUnsolvable() {
         return countUnsolvable;
@@ -38,6 +39,7 @@ public class Result {
         setSteps(0);
         setTimeCost(0.0);
         initStepsList();
+        initTimeList();
     }
 
     public Result(int countSuccess, int countUnsolvable, int countFailed, int steps, double timeCost) {
@@ -46,6 +48,7 @@ public class Result {
         this.countFailed = countFailed;
         this.steps = steps;
         initStepsList();
+        initTimeList();
         this.timeCost = timeCost;
     }
 
@@ -57,12 +60,36 @@ public class Result {
         return sum / stepsList.size();
     }
 
+    public double getAvgTime(){
+        double sum = 0.0;
+        for (Double time : timeList) {
+            sum += time;
+        }
+        return sum / timeList.size();
+    }
+
     public List<Integer> getStepsList() {
         return stepsList;
     }
 
     public void initStepsList() {
         this.stepsList = new ArrayList<>();
+    }
+
+    public void initTimeList(){
+        this.timeList = new ArrayList<>();
+    }
+
+    public List<Double> getTimeList() {
+        return timeList;
+    }
+
+    public void setTimeList(List<Double> timeList) {
+        this.timeList = timeList;
+    }
+
+    public void addTime(double timeCost){
+        this.timeList.add(timeCost);
     }
 
     public void addStepInList(int step) {

@@ -11,10 +11,10 @@ public class Genetic implements Algorithm {
     Random random = new Random();
     int NUMS = 20;
     int LENGTH = 50;
-    int GENERATION = 200;
-    double RETAIN_PROBABILITY = 0.3;
-    double ELIMINATE_PROBABILITY = 0.3;
+    int GENERATION = 100;
+    int K = 10;
     double MUTATION_PROBABILITY = 0.3;
+    double CROSSOVER_PROBABILITY = 0.9;
     int[][] population;
 
 
@@ -22,16 +22,29 @@ public class Genetic implements Algorithm {
     final static int[] X_MOVE = new int[]{1, -1, 0, 0};
     final static int[] Y_MOVE = new int[]{0, 0, -1, 1};
 
-    public Genetic() {
-    }
-
-    public Genetic(int NUMS, int LENGTH, int GENERATION, double RETAIN_PROBABILITY, double ELIMINATE_PROBABILITY, double MUTATION_PROB) {
+    public Genetic(int NUMS, int LENGTH, int GENERATION, int K, double CROSSOVER_PROBABILITY, double MUTATION_PROB) {
         this.NUMS = NUMS;
         this.LENGTH = LENGTH;
         this.GENERATION = GENERATION;
-        this.RETAIN_PROBABILITY = RETAIN_PROBABILITY;
-        this.ELIMINATE_PROBABILITY = ELIMINATE_PROBABILITY;
+        this.K = K;
+        this.CROSSOVER_PROBABILITY = CROSSOVER_PROBABILITY;
         this.MUTATION_PROBABILITY = MUTATION_PROB;
+    }
+
+    public int getK() {
+        return K;
+    }
+
+    public void setK(int k) {
+        this.K = k;
+    }
+
+    public double getCROSSOVER_PROBABILITY() {
+        return CROSSOVER_PROBABILITY;
+    }
+
+    public void setCROSSOVER_PROBABILITY(double CROSSOVER_PROBABILITY) {
+        this.CROSSOVER_PROBABILITY = CROSSOVER_PROBABILITY;
     }
 
     public void setNUMS(int NUMS) {
@@ -44,14 +57,6 @@ public class Genetic implements Algorithm {
 
     public void setGENERATION(int GENERATION) {
         this.GENERATION = GENERATION;
-    }
-
-    public void setRETAIN_PROBABILITY(double RETAIN_PROBABILITY) {
-        this.RETAIN_PROBABILITY = RETAIN_PROBABILITY;
-    }
-
-    public void setELIMINATE_PROBABILITY(double ELIMINATE_PROBABILITY) {
-        this.ELIMINATE_PROBABILITY = ELIMINATE_PROBABILITY;
     }
 
     public void setMUTATION_PROBABILITY(double MUTATION_PROBABILITY) {
@@ -73,169 +78,84 @@ public class Genetic implements Algorithm {
         int countStep = 0;
         int geneCount = 0;
         int[] bestAns = new int[LENGTH];
-
-        //while (geneCount < GENERATION) {
-        //    countStep++;
-        //
-        //    population = calFitnessInChromosome(state, population);
-        //    population = sort(population);
-        //
-        //    System.out.println();
-        //    System.out.println("The geneCount is " + geneCount);
-        //    //System.out.println("The best ans = " + Arrays.toString(bestAns));
-        //
-        //    System.out.println("The fitness is :");
-        //    for (int[] chromosome : population) {
-        //        System.out.print(chromosome[chromosome.length - 1] + " ");
-        //        //System.out.println(Arrays.toString(chromosome));
-        //    }
-        //    System.out.println();
-        //
-        //    //find the path
-        //    if (population[0][population[0].length - 1] == 0) {
-        //        System.out.println("Find the target path!");
-        //
-        //        result.setCountSuccess(result.getCountSuccess() + 1);
-        //        result.addStepInList(countStep);
-        //        return;
-        //    }
-        //    int[] temp = Arrays.copyOf(population[0], population[0].length - 1);
-        //    if (Arrays.equals(bestAns, temp)) {
-        //        geneCount += 1;
-        //    } else {
-        //        geneCount = 0;
-        //    }
-        //    bestAns = Arrays.copyOf(population[0], LENGTH);
-        //
-        //    int[][] childPopulation = new int[NUMS][LENGTH];
-        //    childPopulation[0] = bestAns;
-        //
-        //    //cal the select prob of P(t)
-        //    //store the select probability
-        //    double[] selectProb = new double[population.length];
-        //    double proSum = 0.0;
-        //    for (int j = 0; j < selectProb.length; j++) {
-        //        int fitness = population[j][population[0].length - 1];
-        //        int prob = 160 - fitness;
-        //        proSum += prob;
-        //    }
-        //    for (int j = 0; j < selectProb.length; j++) {
-        //        int fitness = population[j][population[0].length - 1];
-        //        int prob = 160 - fitness;
-        //        selectProb[j] = prob / proSum;
-        //    }
-        //    //System.out.println("The k generation = " + geneCount + " is " + Arrays.toString(selectProb));
-        //
-        //    for (int i = 1; i < NUMS; i++) {
-        //        //插入位置：i，j
-        //        int[] father;
-        //        int[] mother;
-        //        do {
-        //            father = roulette(population, selectProb);
-        //            mother = roulette(population, selectProb);
-        //        } while (Arrays.equals(father, mother));
-        //
-        //        int[] son = new int[LENGTH + 1];
-        //        if (random.nextDouble() < 0.5) {
-        //            son = crossover(father, mother);
-        //        } else {
-        //            son = father;
-        //        }
-        //
-        //        //if (random.nextDouble() < 0.1) {
-        //        for (int k = 0; k < son.length; k++) {
-        //            if (random.nextDouble() < MUTATION_PROBABILITY) {
-        //                son[k] = random.nextInt(4);
-        //            }
-        //        }
-        //        //}
-        //        childPopulation[i] = Arrays.copyOf(son, son.length - 1);
-        //    }
-        //    population = childPopulation;
-        //}
-
-        for (int i = 0; i < GENERATION; i++) {
-            System.out.println();
-            System.out.println("The " + i + " generation:");
-            //Move and calculate the fitness
-            population = calFitnessInChromosome(state, population);
+        boolean skipCrossover = false;
+        double startTime = System.currentTimeMillis();
+        while (geneCount < GENERATION) {
             countStep++;
 
-            //get the target
-            for (int[] chromosome : population) {
-                if (chromosome[chromosome.length - 1] == 0) {
-                    System.out.println("Find the final state! The step = " + countStep);
-                    //record the success result
-                    result.setCountSuccess(result.getCountSuccess() + 1);
-                    //record the steps cost
-                    result.addStepInList(countStep);
-                    return;
-                }
-            }
-
-            //sort the population by fitness
+            population = calFitnessInChromosome(state, population);
             population = sort(population);
-            //TODO：del
-            System.out.println("chromosome after sorted! ");
-            for (int[] chromosome : population) {
-                System.out.print(chromosome[chromosome.length - 1] + " ");
+
+            //find the path
+            if (population[0][population[0].length - 1] == 0) {
+                System.out.println("Find the target path!");
+                //record time consumption
+                double endTime = System.currentTimeMillis();
+                result.addTime(endTime-startTime);
+                //record steps
+                result.setCountSuccess(result.getCountSuccess() + 1);
+                result.addStepInList(countStep);
+                return;
             }
-            System.out.println();
-
-            double[] originSelectProb = new double[population.length];
-            getSelProb(originSelectProb);
-            //select: retain and eliminate
-            int[][] retainPopulation = retain(population, originSelectProb);
-            population = eliminate(population);
-
-            //store the select probability
-            double[] selectProb = new double[population.length];
-            getSelProb(selectProb);
-
-
-            //TODO：del
-            int[][] show = mergeArrays(retainPopulation, population);
-            System.out.println("chromosome after selected");
-            for (int[] chromosome : show) {
-                System.out.print(chromosome[chromosome.length - 1] + " ");
+            int[] temp = Arrays.copyOf(population[0], population[0].length - 1);
+            if (Arrays.equals(bestAns, temp)) {
+                geneCount += 1;
+            } else {
+                geneCount = 0;
             }
-            System.out.println();
-            //System.out.println("selected : " + Arrays.toString(selectProb));
+            bestAns = Arrays.copyOf(population[0], LENGTH);
 
-            for (int j = 0; j < population.length; j++) {
-                int[] childChromosome = Arrays.copyOf(population[j], population[j].length - 1);
-                population[j] = childChromosome;
-            }
-            for (int j = 0; j < retainPopulation.length; j++) {
-                int[] childChromosome = Arrays.copyOf(retainPopulation[j], retainPopulation[j].length - 1);
-                retainPopulation[j] = childChromosome;
+            int[][] childPopulation = new int[NUMS][LENGTH];
+            if (geneCount < K) {
+                childPopulation[0] = bestAns;
+            } else {
+                skipCrossover = true;
             }
 
 
-            //crossover
-            population = crossover(population, selectProb, NUMS - retainPopulation.length);
+            int start;
+            if (skipCrossover) {
+                start = 0;
+            } else {
+                start = 1;
+            }
 
-            //mutation
-            population = mutation(mergeArrays(retainPopulation, population));
+            for (int i = start; i < NUMS; i++) {
+                //insert point：i，j
+                int[] father;
+                int[] mother;
+                do {
+                    father = tournamentSelect(population);
+                    mother = tournamentSelect(population);
 
+                } while (Arrays.equals(father, mother));
+
+                //crossover
+                int[] son;
+                if (random.nextDouble() < CROSSOVER_PROBABILITY && !skipCrossover) {
+                    son = crossover(father, mother);
+                } else {
+                    son = father;
+                }
+
+                //mutation
+                //if (random.nextDouble() < MUTATION_PROBABILITY) {
+                for (int k = 0; k < son.length; k++) {
+                    if (random.nextDouble() < MUTATION_PROBABILITY) {
+                        son[k] = random.nextInt(4);
+                    }
+                }
+                //}
+                childPopulation[i] = Arrays.copyOf(son, son.length - 1);
+                skipCrossover = false;
+                //i++;
+            }
+            population = childPopulation;
         }
+
         //record the fail result
         result.setCountFailed(result.getCountFailed() + 1);
         System.out.println("Cannot find the final state! The step = " + countStep);
-    }
-
-    public void getSelProb(double[] selectProb) {
-        double proSum = 0.0;
-        for (int j = 0; j < selectProb.length; j++) {
-            int fitness = population[j][population[0].length - 1];
-            int prob = 160 - fitness;
-            proSum += prob;
-        }
-        for (int j = 0; j < selectProb.length; j++) {
-            int fitness = population[j][population[0].length - 1];
-            int prob = 160 - fitness;
-            selectProb[j] = prob / proSum;
-        }
     }
 
     /**
@@ -291,7 +211,6 @@ public class Genetic implements Algorithm {
 
     }
 
-
     /**
      * Move the blank in the state, follow the chromosome
      *
@@ -337,87 +256,19 @@ public class Genetic implements Algorithm {
         return population;
     }
 
-    /**
-     * @param population The population to retain.
-     * @return
-     */
-    int[][] retain(int[][] population, double[] originSelectProb) {
+    private int[] tournamentSelect(int[][] population) {
         int num = population.length;
         int length = population[0].length;
-        int retainLength = (int) (num * RETAIN_PROBABILITY);
 
-        //keep the best ans
-        int[][] retainList = new int[retainLength][length];
-        retainList[0] = Arrays.copyOf(population[0], length);
-
-        //roulette() get the chromosome
-        for (int i = 1; i < retainLength; i++) {
-            int[] chromosome = Arrays.copyOf(roulette(population, originSelectProb), length);
-            retainList[i] = chromosome;
-        }
-        return retainList;
-    }
-
-    /**
-     * @param population The population to eliminate.
-     * @return The population after eliminating.
-     */
-    int[][] eliminate(int[][] population) {
-        int num = population.length;
-        int length = population[0].length;
-        int eliminateLength = (int) (num * ELIMINATE_PROBABILITY);
-        int afterEliminate = num - eliminateLength;
-        //length-1, del the fitness stored in array
-        int[][] afterEliPopu = new int[afterEliminate][length];
-        for (int i = 0; i < afterEliminate; i++) {
-            int[] chromosome = Arrays.copyOf(population[i], length);
-            afterEliPopu[i] = chromosome;
-        }
-        return afterEliPopu;
-    }
-
-    /**
-     * @param population the population to crossover
-     * @param nums       the number of retain population
-     * @return
-     */
-    private int[][] crossover(int[][] population, double[] selectProb, int nums) {
-        int[][] newPopulation = new int[nums][population[0].length];
-
-        //roulette_algorithm get father and mother
-        int[] father;
-        int[] mother;
-        for (int j = 0; j < nums; j++) {
-            do {
-                father = roulette(population, selectProb);
-                mother = roulette(population, selectProb);
-            } while (Arrays.equals(father, mother));
-            newPopulation[j] = crossover(father, mother);
-        }
-        return newPopulation;
-    }
-
-    /**
-     * select chromosome from population by selectProb
-     *
-     * @param population
-     * @param selectProb
-     * @return
-     */
-    private int[] roulette(int[][] population, double[] selectProb) {
-        int[] father = new int[population[0].length];
-        double index = 0.0;
-        double bound = random.nextDouble();
-        for (int i = 0; i < selectProb.length; i++) {
-            index += selectProb[i];
-            if (index > bound) {
-                //System.out.println("Find the target father!");
-                father = Arrays.copyOf(population[i], population[0].length);
-                //System.out.println(Arrays.toString(father));
-                return father;
+        int indexI = random.nextInt(num);
+        int indexJ = random.nextInt(num);
+        for (int i = 0; i < 5; i++) {
+            int indexK = random.nextInt(num);
+            if (population[indexK][length - 1] < population[indexI][length - 1]) {
+                indexI = indexK;
             }
         }
-        return father;
+        return population[indexI][length - 1] < population[indexJ][length - 1] ? population[indexI] : population[indexJ];
     }
 
     int[] crossover(int[] father, int[] mother) {
@@ -432,46 +283,6 @@ public class Genetic implements Algorithm {
 
         return son;
     }
-
-    /**
-     * Mutate the population
-     *
-     * @param population
-     * @return
-     */
-    int[][] mutation(int[][] population) {
-        for (int i = 0; i < population.length; i++) {
-            for (int j = 0; j < population[0].length; j++) {
-                if (random.nextDouble() < MUTATION_PROBABILITY) {
-                    population[i][j] = random.nextInt(4);
-                }
-            }
-        }
-        return population;
-    }
-
-    /**
-     * merge the two array
-     *
-     * @param first
-     * @param second
-     * @return
-     */
-    int[][] mergeArrays(int[][] first, int[][] second) {
-        int num1 = first.length;
-        int num2 = second.length;
-        int length = first[0].length;
-        int[][] newArray = new int[num1 + num2][length];
-
-        for (int i = 0; i < num1; i++) {
-            newArray[i] = Arrays.copyOf(first[i], length);
-        }
-        for (int i = 0; i < num2; i++) {
-            newArray[num1 + i] = Arrays.copyOf(second[i], length);
-        }
-        return newArray;
-    }
-
 
 }
 

@@ -45,6 +45,7 @@ public class BreadthFirstSearch implements Algorithm {
             closed.add(parent);
             moveBlank(parent);
         }
+
         if (findTarget) {
             System.out.println("Find the target path!");
 

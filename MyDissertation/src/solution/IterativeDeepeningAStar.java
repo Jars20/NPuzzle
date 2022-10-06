@@ -25,6 +25,8 @@ public class IterativeDeepeningAStar implements Algorithm {
 
     private int maxDepth;
 
+    private final int BOUND = 100;
+
     //directions:down,up,left,right
     final static int[] X_MOVE = new int[]{0, 0, 1, -1};
     final static int[] Y_MOVE = new int[]{1, -1, 0, 0};
@@ -68,7 +70,7 @@ public class IterativeDeepeningAStar implements Algorithm {
         setBound(calHeuristicCost(tiles2Sort, size));
 
 
-        for (bound = heuristicCost; bound <= 100; bound = dfs(0, heuristicCost, -1)) {
+        for (bound = heuristicCost; bound <= BOUND; bound = dfs(0, heuristicCost, -1)) {
 
             if (pathGot) {
                 //find the final target
